@@ -3,15 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Análise de Consumo e Estoque de Bagaço</title>
+    <title>Consumo e Estoque de Bagaço</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#111827"/>
+    <!-- Chosen Palette: Amber & Charcoal -->
+    <!-- Application Structure Plan: A estrutura de fluxo lógico foi mantida (Parâmetros -> Resultados -> Previsão -> Análise), pois é intuitiva. A nova interface dark aprimora a hierarquia visual, usando contraste e cor para guiar o olhar do utilizador para os dados mais importantes (resultados, gráficos) e para a interação principal (botão de IA), melhorando a usabilidade geral sem alterar a arquitetura da informação. -->
+    <!-- Visualization & Content Choices: 
+        1. Informação: Parâmetros e Resultados. Método: Sliders e inputs estilizados, cartões de resultados com destaque. Interação: A interação principal foi mantida. Justificação: O novo estilo torna os controlos mais táteis e os resultados mais impactantes.
+        2. Informação: Gráficos (Umidade vs. Consumo, Projeção de Estoque). Método: Gráficos de Linha (Chart.js) reestilizados para o tema escuro. Justificação: A nova paleta de cores (âmbar sobre fundo escuro) aumenta drasticamente a clareza e o apelo visual dos dados, tornando as tendências mais fáceis de identificar.
+        3. Informação: Análise de IA. Método: Botão de chamada para ação com destaque e área de resposta bem definida. Justificação: O botão de destaque âmbar atrai a atenção do utilizador para a funcionalidade mais avançada da aplicação.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -106,11 +112,6 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        #stockpileCanvas {
-            width: 100%;
-            height: auto;
-            max-width: 250px;
-        }
     </style>
 </head>
 <body class="min-h-screen p-4 sm:p-6 lg:p-8">
@@ -166,25 +167,40 @@
                         </div>
                     </div>
                     
-                    <div class="flex flex-col justify-center items-center p-6 rounded-lg result-card space-y-4 text-center border border-gray-700">
-                        <h2 class="text-lg font-semibold text-gray-300">Consumo de Bagaço</h2>
-                        <div>
-                            <span id="consumoResult" class="text-6xl font-bold text-white">0.00</span>
-                            <span class="text-xl font-medium text-gray-400">t/h</span>
-                        </div>
+                    <div class="flex flex-col justify-center p-6 rounded-lg result-card space-y-4 border border-gray-700">
                         <div class="text-center">
-                             <p class="text-base text-gray-400">Consumo 24h: <span id="consumo24hResult" class="font-bold text-gray-200">0.00</span> t</p>
+                            <h2 class="text-lg font-semibold text-gray-300">Consumo de Bagaço</h2>
+                            <div>
+                                <span id="consumoResult" class="text-6xl font-bold text-white">0.00</span>
+                                <span class="text-xl font-medium text-gray-400">t/h</span>
+                            </div>
+                            <p class="text-base text-gray-400">Consumo 24h: <span id="consumo24hResult" class="font-bold text-gray-200">0.00</span> t</p>
                         </div>
-                        <div class="w-full grid grid-cols-2 gap-4 text-sm pt-4">
+                        <div class="w-full grid grid-cols-2 gap-3 text-sm pt-4 text-center">
                             <div class="p-3 bg-gray-800/50 rounded-lg">
-                                <p class="font-medium text-gray-400">PCI do Bagaço</p>
+                                <p class="font-medium text-gray-400">PCI</p>
                                 <p id="pciResult" class="font-bold text-xl text-white">0</p>
                                 <p class="text-xs text-gray-500">kcal/kg</p>
                             </div>
                             <div class="p-3 bg-gray-800/50 rounded-lg">
-                                <p class="font-medium text-gray-400">Energia Gerada</p>
+                                <p class="font-medium text-gray-400">PCS</p>
+                                <p id="pcsResult" class="font-bold text-xl text-white">0</p>
+                                <p class="text-xs text-gray-500">kcal/kg</p>
+                            </div>
+                            <div class="p-3 bg-gray-800/50 rounded-lg">
+                                <p class="font-medium text-gray-400">Entalpia</p>
+                                <p id="entalpiaResult" class="font-bold text-xl text-white">0</p>
+                                <p class="text-xs text-gray-500">kJ/kg</p>
+                            </div>
+                             <div class="p-3 bg-gray-800/50 rounded-lg">
+                                <p class="font-medium text-gray-400">Energia Térmica</p>
                                 <p id="energiaResult" class="font-bold text-xl text-white">0</p>
                                 <p class="text-xs text-gray-500">Gcal/h</p>
+                            </div>
+                             <div class="p-3 bg-amber-600/20 rounded-lg col-span-2 border border-amber-500">
+                                <p class="font-medium text-amber-300">Energia Elétrica</p>
+                                <p id="energiaMwResult" class="font-bold text-2xl text-amber-400">0.0</p>
+                                <p class="text-xs text-amber-400/70">MW</p>
                             </div>
                         </div>
                     </div>
@@ -192,21 +208,17 @@
             </section>
             
             <section class="card p-6 lg:p-8">
-                 <h2 class="text-2xl font-bold text-center mb-6 text-white flex items-center justify-center"><span class="text-amber-400 mr-3">📦</span>Previsão de Estoque</h2>
-                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-8">
-                    <div class="flex flex-col items-center justify-center">
-                        <h3 class="text-lg font-semibold text-gray-300 mb-2">Nível do Estoque Atual</h3>
-                        <div class="w-full max-w-[250px]">
-                            <canvas id="stockpileCanvas" width="250" height="200"></canvas>
-                        </div>
-                        <p id="stockpilePercentage" class="mt-2 text-xl font-bold text-white"></p>
-                    </div>
-                    <div class="text-center p-6 h-full flex flex-col justify-center result-card rounded-lg border border-gray-700">
-                        <h3 class="text-lg font-semibold text-gray-300">Autonomia do Estoque</h3>
-                        <p id="tempoEstoqueResult" class="text-5xl font-bold text-white mt-2">Calculando...</p>
-                    </div>
+                 <h2 class="text-2xl font-bold text-center mb-1 text-white flex items-center justify-center"><span class="text-amber-400 mr-3">📦</span>Previsão de Estoque</h2>
+                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center mt-6">
+                     <div class="md:col-span-1 text-center p-6 result-card rounded-lg border border-gray-700">
+                         <h3 class="text-lg font-semibold text-gray-300">Autonomia do Estoque</h3>
+                         <p id="tempoEstoqueResult" class="text-4xl font-bold text-white mt-2">Calculando...</p>
+                     </div>
+                     <div class="md:col-span-2 h-48 md:h-full">
+                         <canvas id="bagasseHeap" class="w-full h-full"></canvas>
+                     </div>
                  </div>
-                <div class="chart-container">
+                 <div class="chart-container mt-8">
                     <canvas id="estoqueChart"></canvas>
                 </div>
             </section>
@@ -238,23 +250,13 @@
             
             <footer class="text-center text-sm text-gray-500 pt-4 pb-4">
                  <p class="font-semibold mb-2 text-gray-400">Metodologia de Cálculo</p>
-                 <p><strong>PCI (Poder Calorífico Inferior):</strong> (4400 + (Fibra% - 48) * 10) - (51 * %Umidade). <strong>Entalpia:</strong> Calculada para vapor superaquecido a 92 bar. <strong>Consumo:</strong> (Produção de Vapor * Ganho de Entalpia) / (PCI * Eficiência).</p>
+                 <p><strong>PCS:</strong> 4650 - (46.5 * %Umidade). <strong>PCI:</strong> (4400 + (Fibra% - 48) * 10) - (51 * %Umidade). <strong>Entalpia:</strong> Calculada para vapor superaquecido a 92 bar. <strong>Consumo:</strong> (Produção de Vapor * Ganho de Entalpia) / (PCI * Eficiência).</p>
                  <p class="mt-4">&copy; 2025 Ferramenta de Análise Energética. Todos os direitos reservados.</p>
             </footer>
         </main>
     </div>
 
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then(registration => {
-                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                }, err => {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
-            });
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
             const vaporSlider = document.getElementById('vaporSlider');
             const umidadeSlider = document.getElementById('umidadeSlider');
@@ -263,69 +265,36 @@
             const fibraSlider = document.getElementById('fibraSlider');
             const estoqueInicialInput = document.getElementById('estoqueInicialInput');
             const producaoDiariaInput = document.getElementById('producaoDiariaInput');
+
             const vaporValue = document.getElementById('vaporValue');
             const umidadeValue = document.getElementById('umidadeValue');
             const eficienciaValue = document.getElementById('eficienciaValue');
             const temperaturaValue = document.getElementById('temperaturaValue');
             const fibraValue = document.getElementById('fibraValue');
+
             const consumoResult = document.getElementById('consumoResult');
             const consumo24hResult = document.getElementById('consumo24hResult');
             const pciResult = document.getElementById('pciResult');
+            const pcsResult = document.getElementById('pcsResult');
             const energiaResult = document.getElementById('energiaResult');
+            const entalpiaResult = document.getElementById('entalpiaResult');
+            const energiaMwResult = document.getElementById('energiaMwResult');
             const tempoEstoqueResult = document.getElementById('tempoEstoqueResult');
+            
+            const bagasseCanvas = document.getElementById('bagasseHeap');
+            const bagasseCtx = bagasseCanvas.getContext('2d');
+
             const geminiButton = document.getElementById('gemini-button');
             const geminiResponseContainer = document.getElementById('gemini-response-container');
-            
-            const stockpileCanvas = document.getElementById('stockpileCanvas');
-            const stockpileCtx = stockpileCanvas.getContext('2d');
-            const stockpilePercentageLabel = document.getElementById('stockpilePercentage');
 
             let umidadeChart, estoqueChart;
+
             const inputs = [vaporSlider, umidadeSlider, eficienciaSlider, temperaturaSlider, fibraSlider, estoqueInicialInput, producaoDiariaInput];
+            
             const textColor = '#e5e7eb';
             const gridColor = 'rgba(255, 255, 255, 0.1)';
             const accentColor = '#f59e0b';
-            const accentColorTransparent = 'rgba(245, 158, 11, 0.1)';
-
-            const MAX_VISUAL_STOCK = 150000;
-
-            function drawStockpile(percentage) {
-                const w = stockpileCanvas.width;
-                const h = stockpileCanvas.height;
-                stockpileCtx.clearRect(0, 0, w, h);
-
-                const baseY = h * 0.95;
-
-                stockpileCtx.strokeStyle = '#4b5563';
-                stockpileCtx.lineWidth = 2;
-                stockpileCtx.beginPath();
-                stockpileCtx.moveTo(0, baseY);
-                stockpileCtx.lineTo(w, baseY);
-                stockpileCtx.stroke();
-                
-                if (percentage > 0) {
-                    const pileHeight = (h * 0.9) * Math.max(0.01, percentage);
-                    const topY = baseY - pileHeight;
-
-                    const gradient = stockpileCtx.createLinearGradient(0, topY, 0, baseY);
-                    gradient.addColorStop(0, '#f59e0b');
-                    gradient.addColorStop(1, '#b45309');
-
-                    stockpileCtx.fillStyle = gradient;
-                    
-                    stockpileCtx.beginPath();
-                    stockpileCtx.moveTo(0, baseY);
-
-                    stockpileCtx.quadraticCurveTo(w * 0.1, baseY - pileHeight * 0.5, w * 0.2, baseY - pileHeight * 0.4);
-                    stockpileCtx.quadraticCurveTo(w * 0.35, topY, w * 0.5, baseY - pileHeight * 0.7);
-                    stockpileCtx.quadraticCurveTo(w * 0.6, topY - pileHeight * 0.2, w * 0.75, topY);
-                    stockpileCtx.quadraticCurveTo(w * 0.9, baseY - pileHeight * 0.6, w, baseY);
-                    
-                    stockpileCtx.closePath();
-                    stockpileCtx.fill();
-                }
-            }
-
+            const accentColorTransparent = 'rgba(245, 158, 11, 0.2)';
 
             function getSteamEnthalpy(temp) {
                 const baseTemp = 520;
@@ -333,6 +302,55 @@
                 const tempCorrection = (temp - baseTemp) * 0.5;
                 return baseEnthalpy + tempCorrection;
             }
+            
+            function drawBagasseHeap(percentage) {
+                const canvas = bagasseCtx.canvas;
+                const w = canvas.width;
+                const h = canvas.height;
+                bagasseCtx.clearRect(0, 0, w, h);
+
+                if (percentage <= 0) return;
+
+                const maxHeight = h * 0.9 * percentage;
+                const baseY = h;
+
+                const gradient = bagasseCtx.createLinearGradient(0, h - maxHeight, 0, h);
+                gradient.addColorStop(0, '#a16207'); 
+                gradient.addColorStop(1, '#78350f'); 
+
+                bagasseCtx.fillStyle = gradient;
+                
+                bagasseCtx.beginPath();
+                bagasseCtx.moveTo(0, baseY);
+
+                const numPoints = 40;
+                for (let i = 0; i <= numPoints; i++) {
+                    const x = (i / numPoints) * w;
+                    
+                    const mainArc = Math.sin((i / numPoints) * Math.PI);
+                    const peaksAndValleys = Math.sin((i / numPoints) * Math.PI * 6) * 0.15;
+                    const noise = Math.sin((i / numPoints) * Math.PI * 13) * 0.05;
+
+                    const totalHeightFactor = mainArc * (1 + peaksAndValleys + noise);
+                    const y = baseY - (maxHeight * totalHeightFactor);
+                    
+                    bagasseCtx.lineTo(x, y);
+                }
+                
+                bagasseCtx.lineTo(w, baseY);
+                bagasseCtx.closePath();
+                bagasseCtx.fill();
+            }
+
+            function resizeCanvas() {
+                const parent = bagasseCanvas.parentElement;
+                bagasseCanvas.width = parent.clientWidth;
+                bagasseCanvas.height = parent.clientHeight;
+                calculateAndDisplay();
+            }
+            
+            window.addEventListener('resize', resizeCanvas);
+
 
             function calculateAndDisplay() {
                 const vapor = parseFloat(vaporSlider.value);
@@ -342,43 +360,57 @@
                 const fibra = parseFloat(fibraSlider.value);
                 const estoqueInicial = parseFloat(estoqueInicialInput.value) || 0;
                 const producaoDiaria = parseFloat(producaoDiariaInput.value) || 0;
+
                 vaporValue.textContent = vapor.toFixed(0);
                 umidadeValue.textContent = umidade.toFixed(1);
                 eficienciaValue.textContent = (eficiencia * 100).toFixed(1);
                 temperaturaValue.textContent = temperatura.toFixed(0);
                 fibraValue.textContent = fibra.toFixed(1);
+                
                 const pciBaseSeco = 4400 + (fibra - 48) * 10;
                 const pci = pciBaseSeco - (51 * umidade);
+                const pcs = 4650 - (46.5 * umidade);
+                
                 const entalpiaVaporKJ = getSteamEnthalpy(temperatura);
                 const entalpiaAguaKJ = 419;
                 const deltaEntalpiaKJ = entalpiaVaporKJ - entalpiaAguaKJ;
                 const KJ_TO_KCAL = 0.239006;
                 const deltaEntalpiaKcal = deltaEntalpiaKJ * KJ_TO_KCAL;
+                
                 const vaporKgH = vapor * 1000;
                 const energiaUtilKcalH = vaporKgH * deltaEntalpiaKcal;
                 const energiaTotalKcalH = energiaUtilKcalH / eficiencia;
                 const consumoKgH = energiaTotalKcalH / pci;
+                
                 const consumoTonH = consumoKgH / 1000;
                 const consumo24h = consumoTonH * 24;
+                
+                const consumoEspecificoTurbina = 5.2;
+                const energiaMw = vapor / consumoEspecificoTurbina;
+
                 consumoResult.textContent = isNaN(consumoTonH) ? '0.00' : consumoTonH.toFixed(2);
                 consumo24hResult.textContent = isNaN(consumo24h) ? '0.00' : consumo24h.toFixed(2);
                 pciResult.textContent = isNaN(pci) ? '0' : pci.toFixed(0);
+                pcsResult.textContent = isNaN(pcs) ? '0' : pcs.toFixed(0);
+                entalpiaResult.textContent = isNaN(entalpiaVaporKJ) ? '0' : entalpiaVaporKJ.toFixed(0);
                 energiaResult.textContent = isNaN(energiaUtilKcalH) ? '0' : (energiaUtilKcalH / 1_000_000).toFixed(2);
+                energiaMwResult.textContent = isNaN(energiaMw) ? '0.0' : energiaMw.toFixed(1);
+
                 const saldoDiario = producaoDiaria - consumo24h;
                 if (saldoDiario >= 0) {
                     tempoEstoqueResult.textContent = 'Sustentável';
                 } else if (estoqueInicial <= 0) {
-                    tempoEstoqueResult.textContent = 'Sem Estoque';
+                    tempoEstoqueResult.textContent = 'Esgotado';
                 } else {
                     const diasParaAcabar = estoqueInicial / Math.abs(saldoDiario);
                     const dias = Math.floor(diasParaAcabar);
                     const horas = Math.round((diasParaAcabar - dias) * 24);
-                    tempoEstoqueResult.textContent = `${dias} dias e ${horas}h`;
+                    tempoEstoqueResult.textContent = `${dias}d e ${horas}h`;
                 }
-
-                const stockPercentage = Math.min(1, estoqueInicial / MAX_VISUAL_STOCK);
-                drawStockpile(stockPercentage);
-                stockpilePercentageLabel.textContent = `${(stockPercentage * 100).toFixed(1)}% da capacidade`;
+                
+                const maxEstoqueVisual = Math.max(100000, estoqueInicial * 1.2); 
+                const estoquePercent = Math.min(estoqueInicial / maxEstoqueVisual, 1);
+                drawBagasseHeap(estoquePercent);
                 
                 updateUmidadeChartData();
                 updateEstoqueChartData();
@@ -389,8 +421,9 @@
                 const eficiencia = parseFloat(eficienciaSlider.value) / 100;
                 const temperatura = parseFloat(temperaturaSlider.value);
                 const fibra = parseFloat(fibraSlider.value);
+                
                 const entalpiaVaporKJ = getSteamEnthalpy(temperatura);
-                const entalpiaAguaKJ = 419;
+                const entalpiaAguaKJ = 419; 
                 const deltaEntalpiaKJ = entalpiaVaporKJ - entalpiaAguaKJ;
                 const KJ_TO_KCAL = 0.239006;
                 const deltaEntalpiaKcal = deltaEntalpiaKJ * KJ_TO_KCAL;
@@ -398,6 +431,7 @@
                 const energiaUtilKcalH = vaporKgH * deltaEntalpiaKcal;
                 const energiaTotalKcalH = energiaUtilKcalH / eficiencia;
                 const pciBaseSeco = 4400 + (fibra - 48) * 10;
+
                 const labels = [];
                 const data = [];
                 for (let u = 40; u <= 65; u += 1) {
@@ -406,9 +440,12 @@
                     const consumo = (energiaTotalKcalH / pci) / 1000;
                     data.push(consumo);
                 }
-                umidadeChart.data.labels = labels;
-                umidadeChart.data.datasets[0].data = data;
-                umidadeChart.update();
+
+                if(umidadeChart) {
+                    umidadeChart.data.labels = labels;
+                    umidadeChart.data.datasets[0].data = data;
+                    umidadeChart.update();
+                }
             }
 
             function updateEstoqueChartData() {
@@ -416,6 +453,7 @@
                 const producaoDiaria = parseFloat(producaoDiariaInput.value) || 0;
                 const consumo24h = parseFloat(consumo24hResult.textContent) || 0;
                 const saldoDiario = producaoDiaria - consumo24h;
+
                 const labels = [];
                 const data = [];
                 for (let i = 0; i <= 30; i++) {
@@ -423,9 +461,11 @@
                     const estoqueAtual = estoqueInicial + (saldoDiario * i);
                     data.push(Math.max(0, estoqueAtual));
                 }
-                estoqueChart.data.labels = labels;
-                estoqueChart.data.datasets[0].data = data;
-                estoqueChart.update();
+                if(estoqueChart) {
+                    estoqueChart.data.labels = labels;
+                    estoqueChart.data.datasets[0].data = data;
+                    estoqueChart.update();
+                }
             }
 
             function createUmidadeChart() {
@@ -433,10 +473,13 @@
                 umidadeChart = new Chart(ctx, {
                     type: 'line',
                     data: { labels: [], datasets: [{ label: 'Consumo de Bagaço (t/h)', data: [], borderColor: accentColor, backgroundColor: accentColorTransparent, borderWidth: 3, fill: true, tension: 0.4 }] },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: false, title: { display: true, text: 'Consumo (t/h)', color: textColor }, ticks: { color: textColor }, grid: { color: gridColor } }, x: { title: { display: true, text: 'Umidade do Bagaço (%)', color: textColor }, ticks: { color: textColor }, grid: { color: gridColor } } }, plugins: { tooltip: { mode: 'index', intersect: false }, legend: { display: false } }, interaction: { mode: 'nearest', axis: 'x', intersect: false } }
+                    options: { responsive: true, maintainAspectRatio: false, scales: { 
+                        y: { beginAtZero: false, title: { display: true, text: 'Consumo (t/h)', color: textColor }, ticks: { color: textColor }, grid: { color: gridColor } }, 
+                        x: { title: { display: true, text: 'Umidade do Bagaço (%)', color: textColor }, ticks: { color: textColor }, grid: { color: gridColor } }
+                    }, plugins: { tooltip: { mode: 'index', intersect: false }, legend: { display: false }}, interaction: { mode: 'nearest', axis: 'x', intersect: false }}
                 });
             }
-
+            
             function createEstoqueChart() {
                 const ctx = document.getElementById('estoqueChart').getContext('2d');
                 estoqueChart = new Chart(ctx, {
@@ -445,7 +488,18 @@
                         labels: [],
                         datasets: [{ label: 'Projeção de Estoque (t)', data: [], borderColor: accentColor, backgroundColor: accentColorTransparent, borderWidth: 3, fill: true, tension: 0.1 }]
                     },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, title: { display: true, text: 'Estoque (toneladas)', color: textColor }, ticks: { color: textColor }, grid: { color: gridColor } }, x: { title: { display: true, text: 'Projeção para os Próximos 30 Dias', color: textColor }, ticks: { color: textColor }, grid: { color: gridColor } } }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return `${context.dataset.label}: ${context.parsed.y.toFixed(2)} t`; } } } } }
+                    options: { responsive: true, maintainAspectRatio: false, scales: {
+                            y: { beginAtZero: true, title: { display: true, text: 'Estoque (toneladas)', color: textColor }, ticks: { color: textColor }, grid: { color: gridColor } },
+                            x: { title: { display: true, text: 'Projeção para os Próximos 30 Dias', color: textColor }, ticks: { color: textColor }, grid: { color: gridColor } }
+                        }, plugins: { legend: { display: false }, tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${context.parsed.y.toFixed(2)} t`;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 });
             }
 
@@ -469,6 +523,10 @@
                     umidade: umidadeValue.textContent,
                     eficiencia: eficienciaValue.textContent,
                     fibra: fibraValue.textContent,
+                    pci: pciResult.textContent,
+                    pcs: pcsResult.textContent,
+                    entalpia: entalpiaResult.textContent,
+                    energiaMw: energiaMwResult.textContent,
                     estoque: estoqueInicialInput.value,
                     producaoDiaria: producaoDiariaInput.value,
                     consumoDiario: consumo24hResult.textContent,
@@ -485,14 +543,18 @@
                     * Umidade do Bagaço: ${data.umidade}%
                     * Fibra do Bagaço: ${data.fibra}%
                     * Eficiência da Caldeira: ${data.eficiencia}%
+                    * PCI do Bagaço: ${data.pci} kcal/kg
+                    * PCS do Bagaço: ${data.pcs} kcal/kg
+                    * Entalpia do Vapor: ${data.entalpia} kJ/kg
+                    * Produção de Energia Elétrica Estimada: ${data.energiaMw} MW
                     * Estoque Inicial: ${data.estoque} toneladas
                     * Produção Diária de Bagaço: ${data.producaoDiaria} t/dia
                     * Consumo Diário de Bagaço: ${data.consumoDiario} t/dia
                     * Previsão de Estoque: ${data.previsao}
 
                     Com base nesses dados, forneça:
-                    1. Uma breve análise da situação atual do consumo e do estoque, considerando o impacto da fibra.
-                    2. Pelo menos três recomendações claras e práticas para otimizar o consumo de combustível, melhorar a eficiência ou gerir melhor o estoque. Foque nos pontos mais críticos (ex: alta umidade, baixa fibra, etc).
+                    1. Uma breve análise da situação atual do consumo, geração de energia e do estoque.
+                    2. Pelo menos três recomendações claras e práticas para otimizar o consumo de combustível e maximizar a geração de energia elétrica.
                     3. Formate a resposta em markdown, usando títulos e listas.
                 `;
 
@@ -510,14 +572,20 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
-                    if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
                     const result = await response.json();
                     const candidate = result.candidates?.[0];
                     if (candidate && candidate.content?.parts?.[0]?.text) {
                         const text = candidate.content.parts[0].text;
                         geminiResponseContainer.innerHTML = markdownToHtml(text);
                         geminiResponseContainer.classList.add("gemini-response");
-                    } else { throw new Error("Resposta da API inválida."); }
+                    } else {
+                        throw new Error("Resposta da API inválida.");
+                    }
                 } catch (error) {
                     console.error("Erro ao chamar a API Gemini:", error);
                     geminiResponseContainer.innerHTML = '<p class="text-red-500 text-center">Ocorreu um erro ao gerar a análise. Por favor, tente novamente.</p>';
@@ -527,9 +595,11 @@
             }
             
             geminiButton.addEventListener('click', callGeminiApi);
+
             createUmidadeChart();
             createEstoqueChart();
-            calculateAndDisplay();
+            resizeCanvas();
+
             inputs.forEach(input => {
                 input.addEventListener('input', calculateAndDisplay);
             });
@@ -537,6 +607,4 @@
     </script>
 </body>
 </html>
-
-
 
