@@ -477,7 +477,24 @@
 
                 const systemPrompt = "Você é um especialista em eficiência de caldeiras industriais e energia de biomassa, com foco em bagaço de cana. A sua tarefa é analisar os dados operacionais fornecidos e gerar um relatório conciso com uma análise da situação atual e recomendações práticas e acionáveis para otimização. Responda em português do Brasil.";
                 
-                const userQuery = `Analise os seguintes dados operacionais de uma caldeira a bagaço e forneça insights e recomendações. ## Dados Atuais * Produção de Vapor: ${data.vapor} t/h * Umidade do Bagaço: ${data.umidade}% * Fibra do Bagaço: ${data.fibra}% * Eficiência da Caldeira: ${data.eficiencia}% * Estoque Inicial: ${data.estoque} toneladas * Produção Diária de Bagaço: ${data.producaoDiaria} t/dia * Consumo Diário de Bagaço: ${data.consumoDiario} t/dia * Previsão de Estoque: ${data.previsao} Com base nesses dados, forneça: 1. Uma breve análise da situação atual do consumo e do estoque, considerando o impacto da fibra. 2. Pelo menos três recomendações claras e práticas para otimizar o consumo de combustível, melhorar a eficiência ou gerir melhor o estoque. Foque nos pontos mais críticos (ex: alta umidade, baixa fibra, etc). 3. Formate a resposta em markdown, usando títulos e listas.`;
+                const userQuery = `
+                    Analise os seguintes dados operacionais de uma caldeira a bagaço e forneça insights e recomendações.
+
+                    ## Dados Atuais
+                    * Produção de Vapor: ${data.vapor} t/h
+                    * Umidade do Bagaço: ${data.umidade}%
+                    * Fibra do Bagaço: ${data.fibra}%
+                    * Eficiência da Caldeira: ${data.eficiencia}%
+                    * Estoque Inicial: ${data.estoque} toneladas
+                    * Produção Diária de Bagaço: ${data.producaoDiaria} t/dia
+                    * Consumo Diário de Bagaço: ${data.consumoDiario} t/dia
+                    * Previsão de Estoque: ${data.previsao}
+
+                    Com base nesses dados, forneça:
+                    1. Uma breve análise da situação atual do consumo e do estoque, considerando o impacto da fibra.
+                    2. Pelo menos três recomendações claras e práticas para otimizar o consumo de combustível, melhorar a eficiência ou gerir melhor o estoque. Foque nos pontos mais críticos (ex: alta umidade, baixa fibra, etc).
+                    3. Formate a resposta em markdown, usando títulos e listas.
+                `;
 
                 const apiKey = "";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
@@ -520,5 +537,6 @@
     </script>
 </body>
 </html>
+
 
 
