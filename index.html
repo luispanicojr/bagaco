@@ -63,7 +63,7 @@
             appearance: none;
             width: 20px;
             height: 20px;
-            background: #f59e0b; /* Amber 500 */
+            background: #0ecb38; /* Amber 500 */
             border-radius: 50%;
             cursor: pointer;
             box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
@@ -79,7 +79,7 @@
         .slider::-moz-range-thumb {
             width: 20px;
             height: 20px;
-            background: #f59e0b;
+            background: #0ecb38;
             border-radius: 50%;
             cursor: pointer;
             box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
@@ -95,7 +95,7 @@
             transition: all 0.2s;
         }
         input[type="number"]:focus {
-            border-color: #f59e0b;
+            border-color: #0ecb38;
             outline: none;
             box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
         }
@@ -108,7 +108,7 @@
         
         /* Text gradients for key numbers */
         .text-gradient {
-            background: linear-gradient(to right, #fbbf24, #f59e0b);
+            background: linear-gradient(to right, #fbbf24, #0ecb38);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -123,7 +123,7 @@
             width: 24px;
             height: 24px;
             border-radius: 50%;
-            border-left-color: #f59e0b;
+            border-left-color: #0ecb38;
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -132,7 +132,7 @@
         .gemini-response h3 { color: #fbbf24; font-size: 1.1rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; }
         .gemini-response ul { margin-left: 1rem; }
         .gemini-response li { margin-bottom: 0.5rem; position: relative; padding-left: 1rem; }
-        .gemini-response li::before { content: "•"; color: #f59e0b; position: absolute; left: 0; font-weight: bold; }
+        .gemini-response li::before { content: "•"; color: #0ecb38; position: absolute; left: 0; font-weight: bold; }
         .gemini-response strong { color: #fff; font-weight: 600; }
     </style>
 </head>
@@ -142,7 +142,7 @@
         <header class="text-center mb-12 pt-8 relative">
             <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-amber-500/20 rounded-full blur-3xl -z-10"></div>
             <h1 class="text-4xl sm:text-6xl font-bold tracking-tight text-white mb-2">
-                Bio<span class="text-gradient">Energy</span> Analytics
+                Zilor<span class="text-gradient">Energy</span> Analytics
             </h1>
             <p class="text-gray-400 text-lg font-light max-w-2xl mx-auto">
                 Plataforma avançada de inteligência para gestão de biomassa e eficiência energética.
@@ -350,8 +350,8 @@
             </section>
 
             <footer class="text-center text-xs text-gray-600 pt-8 pb-8">
-                <p class="mb-2">Metodologia: Standard Industry Practices (Biomass Power)</p>
-                <p>&copy; 2025 BioEnergy Analytics Suite. v2.4-Glass</p>
+                <p class="mb-2">Ferramenta para estiamtivas de consumo, carga e projeção da operação.</p>
+                <p>&copy; 2025 ZilorEnergy Analytics Suite. v2.4-Glass</p>
             </footer>
         </main>
     </div>
@@ -593,10 +593,10 @@
                         datasets: [{ 
                             label: 'Consumo (t/h)', 
                             data: [], 
-                            borderColor: '#f59e0b', 
+                            borderColor: '#0ecb38', 
                             backgroundColor: 'rgba(245, 158, 11, 0.1)', 
                             borderWidth: 3, 
-                            pointBackgroundColor: '#f59e0b',
+                            pointBackgroundColor: '#0ecb38',
                             fill: true, 
                             tension: 0.4 
                         }] 
@@ -635,7 +635,7 @@
                         datasets: [{ 
                             label: 'Estoque (t)', 
                             data: [], 
-                            borderColor: '#f59e0b', 
+                            borderColor: '#0ecb38', 
                             backgroundColor: gradient, 
                             borderWidth: 3, 
                             fill: true, 
